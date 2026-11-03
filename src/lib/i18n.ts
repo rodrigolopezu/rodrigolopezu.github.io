@@ -5,6 +5,7 @@ export const site = {
   name: 'Rodrigo López Monroy',
   github: 'https://github.com/rodrigolopezu',
   linkedin: 'https://www.linkedin.com/in/rodrigo-lopez-monroy/',
+  email: 'rodrigolopezu2@gmail.com',
 };
 
 export const ui = {
@@ -15,6 +16,7 @@ export const ui = {
     intro:
       'Me interesa el machine learning y la ciencia de datos. Aquí dejo los proyectos que voy construyendo.',
     github: 'GitHub',
+    email: 'Correo',
     projects: 'Proyectos',
     empty: 'Todavía no hay proyectos.',
     back: '← Todos los proyectos',
@@ -34,6 +36,7 @@ export const ui = {
     intro:
       "I'm interested in machine learning and data science. These are the projects I build along the way.",
     github: 'GitHub',
+    email: 'Email',
     projects: 'Projects',
     empty: 'No projects yet.',
     back: '← All projects',
