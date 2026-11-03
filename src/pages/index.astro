@@ -1,0 +1,24 @@
+---
+import { url } from '../lib/i18n';
+const fallback = url('es/');
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Rodrigo López Monroy</title>
+    <meta http-equiv="refresh" content={`0; url=${fallback}`} />
+    <script is:inline define:vars={{ es: url('es/'), en: url('en/') }}>
+      var lang = null;
+      try {
+        lang = localStorage.getItem('lang');
+      } catch (e) {}
+      if (lang !== 'es' && lang !== 'en') {
+        lang = (navigator.language || 'es').slice(0, 2) === 'es' ? 'es' : 'en';
+      }
+      location.replace(lang === 'es' ? es : en);
+    </script>
+  </head>
+  <body style="background:#000"></body>
+</html>

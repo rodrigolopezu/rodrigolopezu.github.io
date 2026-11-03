@@ -1,0 +1,112 @@
+---
+import '../styles/global.css';
+import ClusterBackground from '../components/ClusterBackground.astro';
+import { ui, other, homeUrl, url, site, type Lang } from '../lib/i18n';
+
+interface Props {
+  lang: Lang;
+  title?: string;
+  description?: string;
+  /** Equivalent page in the other language. */
+  altHref: string;
+}
+
+const { lang, title, description, altHref } = Astro.props;
+const t = ui[lang];
+const fullTitle = title ? `${title} · ${site.name}` : site.name;
+const desc = description ?? t.description;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const alt = other(lang);
+const trained = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Lima' }).format(new Date());
+
+const accents = [
+  { name: 'green', value: '#39ff88' },
+  { name: 'amber', value: '#ffb000' },
+  { name: 'magenta', value: '#ff4fd8' },
+  { name: 'cyan', value: '#3ddcff' },
+];
+---
+
+<!doctype html>
+<html lang={t.htmlLang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={desc} />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang={alt} href={new URL(altHref, Astro.site)} />
+    <link rel="icon" type="image/svg+xml" href={url('favicon.svg')} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={desc} />
+    <meta property="og:type" content="website" />
+    <meta name="theme-color" content="#000000" />
+    <script is:inline>
+      try {
+        var a = localStorage.getItem('accent');
+        if (a) document.documentElement.style.setProperty('--accent', a);
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <ClusterBackground />
+
+    <header class="site-header wrap">
+      <a class="logo" href={homeUrl(lang)}>rlm<b>_</b></a>
+      <nav class="lang" aria-label="Language">
+        <a class:list={{ on: lang === 'es' }} href={lang === 'es' ? '#' : altHref} data-lang="es" hreflang="es" aria-current={lang === 'es' ? 'true' : undefined} aria-label={lang === 'es' ? undefined : t.switchTo}>ES</a>
+        <span>/</span>
+        <a class:list={{ on: lang === 'en' }} href={lang === 'en' ? '#' : altHref} data-lang="en" hreflang="en" aria-current={lang === 'en' ? 'true' : undefined} aria-label={lang === 'en' ? undefined : t.switchTo}>EN</a>
+      </nav>
+    </header>
+
+    <main class="wrap">
+      <slot />
+    </main>
+
+    <footer class="site-footer wrap">
+      <div class="picker" role="group" aria-label={t.color}>
+        {
+          accents.map((a) => (
+            <button class="swatch" style={`--c:${a.value}`} data-accent={a.value} aria-label={a.name} aria-pressed="false" type="button" />
+          ))
+        }
+      </div>
+      <p class="mono dim" style="margin:0">
+        {t.lastTrained}: <time datetime={trained}>{trained}</time> · <a href={site.github}>{t.github}</a>
+      </p>
+    </footer>
+
+    <script>
+      const root = document.documentElement;
+      const swatches = document.querySelectorAll<HTMLButtonElement>('.swatch');
+
+      const mark = () => {
+        const current = getComputedStyle(root).getPropertyValue('--accent').trim().toLowerCase();
+        swatches.forEach((s) => s.setAttribute('aria-pressed', String(s.dataset.accent === current)));
+      };
+
+      swatches.forEach((s) =>
+        s.addEventListener('click', () => {
+          const value = s.dataset.accent!;
+          root.style.setProperty('--accent', value);
+          try {
+            localStorage.setItem('accent', value);
+          } catch {}
+          mark();
+          window.dispatchEvent(new Event('accentchange'));
+        }),
+      );
+      mark();
+
+      // remember the language the visitor picked so the root redirect respects it
+      document.querySelectorAll<HTMLAnchorElement>('[data-lang]').forEach((a) =>
+        a.addEventListener('click', () => {
+          try {
+            localStorage.setItem('lang', a.dataset.lang!);
+          } catch {}
+        }),
+      );
+    </script>
+  </body>
+</html>

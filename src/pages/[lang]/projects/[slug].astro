@@ -1,0 +1,46 @@
+---
+import { getCollection, render } from 'astro:content';
+import { Image } from 'astro:assets';
+import Base from '../../../layouts/Base.astro';
+import { ui, other, homeUrl, projectUrl, splitId, formatDate, type Lang } from '../../../lib/i18n';
+
+export async function getStaticPaths() {
+  const all = await getCollection('projects', (e) => !e.data.draft);
+  return all.map((entry) => {
+    const { slug, lang } = splitId(entry.id);
+    const hasAlt = all.some((e) => e.id === `${slug}/${other(lang)}`);
+    return { params: { lang, slug }, props: { entry, hasAlt } };
+  });
+}
+
+const { entry, hasAlt } = Astro.props;
+const { slug, lang } = splitId(entry.id) as { slug: string; lang: Lang };
+const t = ui[lang];
+const { Content } = await render(entry);
+const d = entry.data;
+const altHref = hasAlt ? projectUrl(other(lang), slug) : homeUrl(other(lang));
+---
+
+<Base lang={lang} title={d.title} description={d.summary} altHref={altHref}>
+  <article>
+    <header class="project-head">
+      <a class="back mono dim" href={homeUrl(lang) + '#projects'}>{t.back}</a>
+      <time class="mono dim" datetime={d.date.toISOString()} style="display:block">
+        {formatDate(d.date, lang)}
+      </time>
+      <h1>{d.title}</h1>
+      {d.facts.length > 0 && <p class="facts mono accent">{d.facts.join(' · ')}</p>}
+      {d.tags.length > 0 && <p class="tags mono dim">{d.tags.join(' · ')}</p>}
+      <div class="links">
+        <a class="btn primary" href={d.repo}>{t.repo} ↗</a>
+        {d.demo && <a class="btn" href={d.demo}>{t.demo} ↗</a>}
+      </div>
+    </header>
+
+    {d.cover && <Image class="cover-full" src={d.cover} alt="" width={1100} />}
+
+    <div class="prose">
+      <Content />
+    </div>
+  </article>
+</Base>

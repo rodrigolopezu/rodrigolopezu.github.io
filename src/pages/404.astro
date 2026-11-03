@@ -1,0 +1,16 @@
+---
+import Base from '../layouts/Base.astro';
+import { homeUrl } from '../lib/i18n';
+---
+
+<Base lang="es" title="404" altHref={homeUrl('en')}>
+  <section class="lost">
+    <h1>Error: overfitting</h1>
+    <p>Esta página no generaliza: no existe.</p>
+    <p class="dim">This page doesn't generalize: it doesn't exist.</p>
+    <div class="links">
+      <a class="btn primary" href={homeUrl('es')}>Inicio</a>
+      <a class="btn" href={homeUrl('en')}>Home</a>
+    </div>
+  </section>
+</Base>
