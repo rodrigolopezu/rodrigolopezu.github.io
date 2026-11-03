@@ -4,6 +4,7 @@ export type Lang = (typeof languages)[number];
 export const site = {
   name: 'Rodrigo López Monroy',
   github: 'https://github.com/rodrigolopezu',
+  linkedin: 'https://www.linkedin.com/in/rodrigo-lopez-monroy/',
 };
 
 export const ui = {
